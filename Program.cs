@@ -42,7 +42,7 @@ namespace CoccoBot
 {
     class Program
     {
-        public static string key = System.IO.File.ReadAllText(@"key.txt");
+        public static string key = System.IO.File.ReadAllText(@"key.txt").Split('\n')[0];
         static TelegramBotClient Bot = new TelegramBotClient(key);
         /* MODIFICA QUI */
         static public int risposte = 31;
