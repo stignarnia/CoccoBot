@@ -76,29 +76,35 @@ namespace CoccoBot
 
             for (int i = 0; i < triggers.Length; i++)
             {
-                string[] parole = triggers[i].Split(' ');
-                foreach (string parola in parole)
-                {
-                    if (e.Message.Text.ToLower().Contains(parola))
+                try {
+                    string[] parole = triggers[i].Split(' ');
+                    foreach (string parola in parole)
                     {
-                        string frase_prob = "";
-                        for (int j = 0; j <= i; j++)
+                        if (e.Message.Text.ToLower().Contains(parola))
                         {
-                            frase_prob = bindings[j];
-                        }
-                        string frase_str = frase_prob.Split(' ')[0];
-                        string prob_str = frase_prob.Split(' ')[1];
+                            string frase_prob = "";
+                            for (int j = 0; j <= i; j++)
+                            {
+                                frase_prob = bindings[j];
+                            }
+                            string frase_str = frase_prob.Split(' ')[0];
+                            string prob_str = frase_prob.Split(' ')[1];
 
-                        int frase = Parse(frase_str);
-                        int prob = Parse(prob_str);
+                            int frase = Parse(frase_str);
+                            int prob = Parse(prob_str);
 
-                        Random rnd_3 = new Random();
-                        int dice = rnd_3.Next(1, 101);
-                        if (dice <= prob)
-                        {
-                            Invia_Risposta_Preimpostata(frase, e.Message.Chat.Id);
+                            Random rnd_3 = new Random();
+                            int dice = rnd_3.Next(1, 101);
+                            if (dice <= prob)
+                            {
+                                Invia_Risposta_Preimpostata(frase, e.Message.Chat.Id);
+                            }
                         }
                     }
+                }
+                catch
+                {
+                    return;
                 }
             }
         }
