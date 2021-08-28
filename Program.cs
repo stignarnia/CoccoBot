@@ -25,8 +25,9 @@ namespace CoccoBot
             {
                 if (e.Message.Text.StartsWith("/"))
                 {
-                    Regex rgx = new Regex(@"\d");
-                    string senzaChiocciola = e.Message.Text.Split('@')[0];
+                    Regex rgx = new Regex(@"^\d");
+                    string[] command = e.Message.Text.Split('@');
+                    string senzaChiocciola = command[0];
                     if (rgx.IsMatch(e.Message.Text) == true)
                     {
                         Invia_Risposta_Preimpostata(Int32.Parse(senzaChiocciola.Split('/')[1]), e.Message.Chat.Id);
@@ -36,6 +37,24 @@ namespace CoccoBot
                         Random rnd = new Random();
                         int number = rnd.Next(1, frasi.Length + 1);
                         Invia_Risposta_Preimpostata(number, e.Message.Chat.Id);
+                    }
+                    else if (senzaChiocciola.Contains("/addPhrase"))
+                    {
+                        string newPhrase = "";
+
+                        try
+                        {
+                            newPhrase = command[0].Split(' ')[1];
+                            AddPhrase(newPhrase, e.Message.Chat.Id);
+                        }
+                        catch
+                        {
+                            Bot.SendTextMessageAsync(e.Message.Chat.Id, "Aggiungi una frase dopo il comando");
+                        }
+                    }
+                    else if (senzaChiocciola == "/addTrigger")
+                    {
+                        ;
                     }
                 }
 
@@ -54,19 +73,41 @@ namespace CoccoBot
                 {
                     Bot.SendTextMessageAsync(e.Message.Chat.Id, "Jabba", replyToMessageId: e.Message.MessageId);
                 }
+                if (e.Message.Text.ToLower().Contains("bot") && (e.Message.Text.ToLower().Contains("bravo") || 
+                    e.Message.Text.ToLower().Contains("good")))
+                {
+                    Bot.SendTextMessageAsync(e.Message.Chat.Id, "Eh ho un algoritmo basato", replyToMessageId: e.Message.MessageId);
+                }
 
                 Bind(e);
             }
 
             if (e.Message.Type.ToString() == "Photo")
             {
-                Random rnd_3 = new Random();
-                int prob_3 = rnd_3.Next(1, 11);
-                if (prob_3 == 1)
+                Random rnd_2 = new Random();
+                int prob_2 = rnd_2.Next(1, 11);
+                if (prob_2 == 1)
                 {
                     Invia_Risposta_Preimpostata(17, e.Message.Chat.Id);
                 }
             }
+        }
+
+        static void AddPhrase(string newPhrase, long id)
+        {
+            System.IO.File.AppendAllText(@"frasi.txt", Environment.NewLine + newPhrase);
+            frasi = System.IO.File.ReadAllText(@"frasi.txt").Split('\n');
+            Bot.SendTextMessageAsync(id, "Fatto! Ho aggiunto la frase: " + newPhrase +
+                "\nEcco la nuova lista di comandi da mandare a BotFather");
+            string commandList = "random - spara una risposta preimpostata a caso" +
+                "\naddPhrase - aggiunge una risposta preimpostata" +
+                "\naddTrigger - aggiunge una o più parole che triggerano una risposta preimpostata";
+            for (int i = 1; i < frasi.Length; i++)
+            {
+                string newLine = "\n" + i + " - " + frasi[i];
+                commandList += newLine;
+            }
+            Bot.SendTextMessageAsync(id, commandList);
         }
 
         static void Bind(MessageEventArgs e)
@@ -87,11 +128,8 @@ namespace CoccoBot
                             {
                                 frase_prob = bindings[j];
                             }
-                            string frase_str = frase_prob.Split(' ')[0];
-                            string prob_str = frase_prob.Split(' ')[1];
-
-                            int frase = Parse(frase_str);
-                            int prob = Parse(prob_str);
+                            int frase = Int32.Parse(frase_prob.Split(' ')[0]);
+                            int prob = Int32.Parse(frase_prob.Split(' ')[1]);
 
                             Random rnd_3 = new Random();
                             int dice = rnd_3.Next(1, 101);
@@ -109,18 +147,17 @@ namespace CoccoBot
             }
         }
 
-        static int Parse(string text)
-        {
-            return Int32.Parse(text);
-        }
-
         static void Invia_Risposta_Preimpostata(int risposta, long id)
         {
             string frase = "";
 
             try
             {
-                if (risposta == 15)
+                if (risposta == 0)
+                {
+                    return;
+                }
+                else if (risposta == 15)
                 {
                     string anno = DateTime.Now.Year.ToString();
                     Bot.SendTextMessageAsync(id, "Siamo nel " + anno + " porca di quella troia");
