@@ -86,8 +86,12 @@ namespace CoccoBot
                         {
                             frase_prob = bindings[j];
                         }
-                        int frase = Int32.Parse(frase_prob.Split(' ')[0]);
-                        int prob = Int32.Parse(frase_prob.Split(' ')[1]);
+                        string frase_str = frase_prob.Split(' ')[0];
+                        string prob_str = frase_prob.Split(' ')[1];
+
+                        int frase = Parse(frase_str);
+                        int prob = Parse(prob_str);
+
                         Random rnd_3 = new Random();
                         int dice = rnd_3.Next(1, 101);
                         if (dice <= prob)
@@ -97,7 +101,11 @@ namespace CoccoBot
                     }
                 }
             }
+        }
 
+        static int Parse(string text)
+        {
+            return Int32.Parse(text);
         }
 
         static void Invia_Risposta_Preimpostata(int risposta, long id)
