@@ -105,8 +105,8 @@ namespace CoccoBot
             Bot.SendTextMessageAsync(id, "Fatto! Ho aggiunto la frase: " + newPhrase +
                 "\nEcco la nuova lista di comandi da mandare a BotFather");
             string commandList = "random - spara una risposta preimpostata a caso" +
-                "\naddPhrase - aggiunge una risposta preimpostata" +
-                "\naddTrigger - aggiunge una o più parole che triggerano una risposta preimpostata";
+                "\naddphrase - aggiunge una risposta preimpostata" +
+                "\naddtrigger - aggiunge una o più parole che triggerano una risposta preimpostata";
             for (int i = 1; i < frasi.Length; i++)
             {
                 string newLine = "\n" + i + " - " + frasi[i];
