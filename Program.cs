@@ -78,6 +78,11 @@ namespace CoccoBot
                 {
                     Bot.SendTextMessageAsync(e.Message.Chat.Id, "Eh ho un algoritmo basato", replyToMessageId: e.Message.MessageId);
                 }
+                if ((e.Message.Text.ToLower() == "eh" || e.Message.Text.ToLower() == "eh?" ||
+                    e.Message.Text.ToLower() == "ehh" || e.Message.Text.ToLower() == "ehh?") && prob <= 100)
+                {
+                    Bot.SendTextMessageAsync(e.Message.Chat.Id, frasi[2], replyToMessageId: e.Message.MessageId);
+                }
 
                 Bind(e);
             }
