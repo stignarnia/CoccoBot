@@ -25,7 +25,7 @@ namespace CoccoBot
             {
                 if (e.Message.Text.StartsWith("/"))
                 {
-                    Regex rgx = new Regex(@"^\d");
+                    Regex rgx = new Regex(@"\d");
                     string[] command = e.Message.Text.Split('@');
                     string senzaChiocciola = command[0];
                     if (rgx.IsMatch(e.Message.Text) == true)
