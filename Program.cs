@@ -134,7 +134,16 @@ namespace CoccoBot
                 "\naddtrigger - aggiunge una o più parole che triggerano una risposta preimpostata";
             for (int i = 1; i < frasi.Length; i++)
             {
-                string newLine = "\n" + i + " - " + frasi[i];
+                string newLine = "";
+
+                if (frasi[i].StartsWith("sticker:"))
+                {
+                    newLine = "\n" + i + " - uno sticker";
+                }
+                else
+                {
+                    newLine = "\n" + i + " - " + frasi[i];
+                }
                 commandList += newLine;
             }
             Bot.SendTextMessageAsync(id, commandList);
