@@ -1,8 +1,6 @@
 ﻿using System;
 using Telegram.Bot;
 using Telegram.Bot.Args;
-using System.Text.RegularExpressions;
-using System.Linq;
 
 namespace CoccoBot
 {
@@ -26,51 +24,77 @@ namespace CoccoBot
             {
                 if (e.Message.Text.StartsWith("/"))
                 {
-                    Regex rgx = new Regex(@"\d");
-                    string[] command = e.Message.Text.Split('@');
-                    string senzaChiocciola = command[0];
-                    if (rgx.IsMatch(e.Message.Text) == true)
+                    string command = e.Message.Text.Replace("@gna_coccobot", "").TrimStart('/');
+                    int number;
+
+                    try
                     {
-                        Invia_Risposta_Preimpostata(Int32.Parse(senzaChiocciola.Split('/')[1]), e.Message.Chat.Id);
-                    }
-                    else if (senzaChiocciola.ToLower() == "/random")
-                    {
-                        Random rnd = new Random();
-                        int number = rnd.Next(1, frasi.Length);
+                        number = Int32.Parse(command);
                         Invia_Risposta_Preimpostata(number, e.Message.Chat.Id);
                     }
-                    else if (senzaChiocciola.ToLower().Contains("/addPhrase"))
+                    catch
                     {
-                        string newPhrase = "";
-
-                        try
+                        if (command.ToLower() == "random")
                         {
-                            newPhrase = command[0].Split(' ')[1];
-                            AddPhrase(newPhrase, e.Message.Chat.Id);
+                            Random rnd = new Random();
+                            number = rnd.Next(1, frasi.Length);
+                            Invia_Risposta_Preimpostata(number, e.Message.Chat.Id);
                         }
-                        catch
+                        else if (command.ToLower().StartsWith("addphrase"))
                         {
-                            Bot.SendTextMessageAsync(e.Message.Chat.Id, "Aggiungi una frase dopo il comando");
+                            string newPhrase = command.Replace("addphrase", "");
+                            newPhrase = newPhrase.Trim();
+                            if (newPhrase != "")
+                            {
+                                AddPhrase(newPhrase, e.Message.Chat.Id);
+                            }
+                            else
+                            {
+                                Bot.SendTextMessageAsync(e.Message.Chat.Id, "Aggiungi una frase dopo il comando");
+                            }
                         }
-                    }
-                    else if (senzaChiocciola.ToLower().Contains("/addTrigger"))
-                    {
-                        ;
+                        else if (command.ToLower().Contains("addtrigger"))
+                        {
+                            string newTrigger = command.Replace("addtrigger", "");
+                            newTrigger = newTrigger.Trim();
+                            try
+                            {
+                                string[] trigger_frase_prob = newTrigger.Split(';');
+                                newTrigger = trigger_frase_prob[0];
+                                string frase = trigger_frase_prob[1].Trim();
+                                int prob = Int32.Parse(trigger_frase_prob[2].Trim());
+                                if (prob > 0 && prob <= 100)
+                                {
+                                    AddTrigger(newTrigger, frase, prob, e.Message.Chat.Id);
+                                }
+                                else
+                                {
+                                    throw new Exception();
+                                }
+                            }
+                            catch
+                            {
+                                Bot.SendTextMessageAsync(e.Message.Chat.Id, "Formula il comando in questo modo: " +
+                                    "nuovo_trigger_1_senza_spazi nuovo_trigger_2_senza_spazi;" +
+                                    " una sola frase da dire anche con spazi che verrà aggiunta al" +
+                                    "file da cui pesca random se non c'è già; probabilità_da_1_a_100");
+                            }
+                        }
                     }
                 }
 
                 Random rnd_2 = new Random();
-                int prob = rnd_2.Next(1, 201);
-                if (prob == 1)
+                int prob_2 = rnd_2.Next(1, 201);
+                if (prob_2 == 1)
                 {
                     Bot.SendTextMessageAsync(e.Message.Chat.Id, frasi[3], replyToMessageId: e.Message.MessageId);
                 }
-                else if (prob == 2)
+                else if (prob_2 == 2)
                 {
                     Bot.SendTextMessageAsync(e.Message.Chat.Id, "Chungastico!", replyToMessageId: e.Message.MessageId);
                 }
 
-                if (e.Message.Text.ToLower().Contains("ginevra") && prob <= 100)
+                if (e.Message.Text.ToLower().Contains("ginevra") && prob_2 <= 100)
                 {
                     Bot.SendTextMessageAsync(e.Message.Chat.Id, "Jabba", replyToMessageId: e.Message.MessageId);
                 }
@@ -80,7 +104,7 @@ namespace CoccoBot
                     Bot.SendTextMessageAsync(e.Message.Chat.Id, "Eh ho un algoritmo basato", replyToMessageId: e.Message.MessageId);
                 }
                 if ((e.Message.Text.ToLower() == "eh" || e.Message.Text.ToLower() == "eh?" ||
-                    e.Message.Text.ToLower() == "ehh" || e.Message.Text.ToLower() == "ehh?") && prob <= 100)
+                    e.Message.Text.ToLower() == "ehh" || e.Message.Text.ToLower() == "ehh?") && prob_2 <= 100)
                 {
                     Bot.SendTextMessageAsync(e.Message.Chat.Id, frasi[2], replyToMessageId: e.Message.MessageId);
                 }
@@ -116,6 +140,21 @@ namespace CoccoBot
             Bot.SendTextMessageAsync(id, commandList);
         }
 
+        static void AddTrigger(string newTrigger, string frase, int prob, long id)
+        {
+            int i;
+
+            for (i = 1; i < frasi.Length && !frasi[i].Contains(frase); i++) {; }
+            if (i == frasi.Length && !frasi[i-2].Contains(frase))
+            {
+                AddPhrase(frase, id);
+            }
+            System.IO.File.AppendAllText(@"triggers.txt", Environment.NewLine + newTrigger);
+            System.IO.File.AppendAllText(@"bindings.txt", Environment.NewLine + i + " " + prob);
+            Bot.SendTextMessageAsync(id, "Fatto! Ora il " + prob + "% delle volte che vedrò scritte la o le parole -" +
+                newTrigger + "- risponderò con " + frasi[i]);
+        }
+
         static void Bind(MessageEventArgs e)
         {
             string[] triggers = System.IO.File.ReadAllText(@"triggers.txt").Split('\n');
@@ -135,11 +174,11 @@ namespace CoccoBot
                                 frase_prob = bindings[j];
                             }
                             int frase = Int32.Parse(frase_prob.Split(' ')[0]);
-                            int prob = Int32.Parse(frase_prob.Split(' ')[1]);
+                            int prob_3 = Int32.Parse(frase_prob.Split(' ')[1]);
 
                             Random rnd_3 = new Random();
                             int dice = rnd_3.Next(1, 101);
-                            if (dice <= prob)
+                            if (dice <= prob_3)
                             {
                                 Invia_Risposta_Preimpostata(frase, e.Message.Chat.Id);
                             }
