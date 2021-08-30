@@ -2,6 +2,7 @@
 using Telegram.Bot;
 using Telegram.Bot.Args;
 using System.Text.RegularExpressions;
+using System.Linq;
 
 namespace CoccoBot
 {
@@ -32,13 +33,13 @@ namespace CoccoBot
                     {
                         Invia_Risposta_Preimpostata(Int32.Parse(senzaChiocciola.Split('/')[1]), e.Message.Chat.Id);
                     }
-                    else if (senzaChiocciola == "/random")
+                    else if (senzaChiocciola.ToLower() == "/random")
                     {
                         Random rnd = new Random();
-                        int number = rnd.Next(1, frasi.Length + 1);
+                        int number = rnd.Next(1, frasi.Length);
                         Invia_Risposta_Preimpostata(number, e.Message.Chat.Id);
                     }
-                    else if (senzaChiocciola.Contains("/addPhrase"))
+                    else if (senzaChiocciola.ToLower().Contains("/addPhrase"))
                     {
                         string newPhrase = "";
 
@@ -52,7 +53,7 @@ namespace CoccoBot
                             Bot.SendTextMessageAsync(e.Message.Chat.Id, "Aggiungi una frase dopo il comando");
                         }
                     }
-                    else if (senzaChiocciola == "/addTrigger")
+                    else if (senzaChiocciola.ToLower().Contains("/addTrigger"))
                     {
                         ;
                     }
