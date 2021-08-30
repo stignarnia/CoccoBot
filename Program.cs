@@ -213,7 +213,15 @@ namespace CoccoBot
                     {
                         frase = frasi[i];
                     }
-                    Bot.SendTextMessageAsync(id, frase);
+                    if (frase.StartsWith("sticker:"))
+                    {
+                        frase = frase.Replace("sticker:", "");
+                        Bot.SendStickerAsync(id, frase);
+                    }
+                    else
+                    {
+                        Bot.SendTextMessageAsync(id, frase);
+                    }
                 }
             }
             catch
