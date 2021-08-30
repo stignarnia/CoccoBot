@@ -25,7 +25,7 @@ namespace CoccoBot
             {
                 if (e.Message.Text.StartsWith("/"))
                 {
-                    Regex rgx = new Regex(@"^\d");
+                    Regex rgx = new Regex(@"\d");
                     string[] command = e.Message.Text.Split('@');
                     string senzaChiocciola = command[0];
                     if (rgx.IsMatch(e.Message.Text) == true)
@@ -78,6 +78,11 @@ namespace CoccoBot
                 {
                     Bot.SendTextMessageAsync(e.Message.Chat.Id, "Eh ho un algoritmo basato", replyToMessageId: e.Message.MessageId);
                 }
+                if ((e.Message.Text.ToLower() == "eh" || e.Message.Text.ToLower() == "eh?" ||
+                    e.Message.Text.ToLower() == "ehh" || e.Message.Text.ToLower() == "ehh?") && prob <= 100)
+                {
+                    Bot.SendTextMessageAsync(e.Message.Chat.Id, frasi[2], replyToMessageId: e.Message.MessageId);
+                }
 
                 Bind(e);
             }
@@ -100,8 +105,8 @@ namespace CoccoBot
             Bot.SendTextMessageAsync(id, "Fatto! Ho aggiunto la frase: " + newPhrase +
                 "\nEcco la nuova lista di comandi da mandare a BotFather");
             string commandList = "random - spara una risposta preimpostata a caso" +
-                "\naddPhrase - aggiunge una risposta preimpostata" +
-                "\naddTrigger - aggiunge una o più parole che triggerano una risposta preimpostata";
+                "\naddphrase - aggiunge una risposta preimpostata" +
+                "\naddtrigger - aggiunge una o più parole che triggerano una risposta preimpostata";
             for (int i = 1; i < frasi.Length; i++)
             {
                 string newLine = "\n" + i + " - " + frasi[i];
